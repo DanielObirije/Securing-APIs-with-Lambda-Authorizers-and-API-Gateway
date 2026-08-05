@@ -46,7 +46,50 @@ data "archive_file" "public_api_zip"{
 
 resource "aws_lambda_function" "token_authorizer" {
   filename = data.archive_file.token_authorizer_zip.output_path
+  function_name = "token-authorizer-${local.name_surfix}"
+  role = aws_iam_role.lambda_execution_role
+  handler = "token_authorizer.lambda_handler"
+  runtime = "python3.9"
+  timeout = 30
+  source_code_hash = data.archive_file.token_authorizer_zip.output_base64sha256
+  description = "Token-based API Gateway authorizer function"
+  tags = local.common_tags
+}
+
+resource "aws_lambda_function" "request_authorizer" {
+  filename = data.archive_file.request_authorizer_zip.output_path
   function_name = "request-authorizer-${local.name_surfix}"
   role = aws_iam_role.lambda_execution_role
-  
+  handler = "request_authorizer.lambda_handler"
+  runtime = "python3.9"
+  timeout = 30
+  source_code_hash = data.archive_file.request_authorizer_zip.output_base64sha256
+  description = "Request-based API Gateway authorizer function"
+  tags = local.common_tags
 }
+
+resource "aws_lambda_function" "protected_api" {
+  filename = data.archive_file.protected_api_zip.output_path
+  function_name = "protected-api-${local.name_surfix}"
+  role = aws_iam_role.lambda_execution_role
+  handler = "protected_api.lambda_handler"
+  runtime = "python3.9"
+  timeout = 30
+  source_code_hash = data.archive_file.protected_api_zip.output_base64sha256
+  description = "Protected API function requiring authorization"
+  tags = local.common_tags
+}
+
+
+resource "aws_lambda_function" "public_api" {
+  filename = data.archive_file.public_api_zip.output_path
+  function_name = "public_api-${local.name_surfix}"
+  role = aws_iam_role.lambda_execution_role
+  handler = "public_api.lambda_handler"
+  runtime = "python3.9"
+  timeout = 30
+  source_code_hash = data.archive_file.public_api.output_base64sha256
+  description = "Public API function without authorization requirements"
+  tags = local.common_tags
+}
+
