@@ -1,7 +1,6 @@
 import json
-import base64
 from urllib.parse import parse_qs
-
+import ipaddress
 
 def lambda_handler(event, context):
     print(f"Request Authorizer Events:{json.dump(event)}")
@@ -17,7 +16,7 @@ def lambda_handler(event, context):
     effect = "Deny"
     context = {}
 
-    if api_key in valid_api_key:
+    if api_key == valid_api_key:
         principal_id = "api-key-user"
         effect = "Allow"
         context = {
@@ -25,7 +24,7 @@ def lambda_handler(event, context):
             "sourceIp": source_ip,
             "permissions": "read,write"
         }
-    elif custom_auth in custom_auth_values:
+    elif custom_auth == custom_auth_values:
         principal_id = "custom-user"
         effect = "Allow"
         context = {
@@ -33,7 +32,7 @@ def lambda_handler(event, context):
           "sourceIp": source_ip,
           "permissions": "read"         
         }
-    elif source_ip.startswith("10.")  or source_ip.startswith("172.") or source_ip.startswith("192.168."):
+    elif ipaddress.ip_address(source_ip).is_private:
         principal_id = "internal-user"
         effect = "Allow"
         context = {
@@ -58,7 +57,6 @@ def generate_policy(principal_id,effect,resource,context=None):
                       "Resource": resource
                   }
             ]
-            
         }
     }
     if context:
