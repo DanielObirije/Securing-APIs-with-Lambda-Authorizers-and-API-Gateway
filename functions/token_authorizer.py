@@ -1,18 +1,18 @@
 import json
 import os
 
-valid_tokens = {
-    "admin-token": {
-        "principal_id": "admin-user",
-        "role": "admin",
-        "permissions": "read,write,delete"
-    },
-    "user-token": {
-        "principal_id": "regular-user",
-        "role": "user",
-        "permissions": "read"
-    }
-}
+# valid_tokens = {
+#     "admin-token": {
+#         "principal_id": "admin-user",
+#         "role": "admin",
+#         "permissions": "read,write,delete"
+#     },
+#     "user-token": {
+#         "principal_id": "regular-user",
+#         "role": "user",
+#         "permissions": "read"
+#     }
+# }
 
 def lambda_handler(event,context):
     print(f"Token Authorizer Event: {json.dumps(event)}")
@@ -24,6 +24,8 @@ def lambda_handler(event,context):
         raise Exception("Unauthorized") 
 
     actual_token = token.replace("Bearer ", "",1)
+
+    valid_tokens = ${valid_tokens}
 
     if actual_token not in valid_tokens:
          raise Exception("Unauthorized")

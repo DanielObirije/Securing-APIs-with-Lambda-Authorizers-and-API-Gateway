@@ -4,9 +4,16 @@ data "archive_file" "token_authorizer_zip"{
     source {
       content = templatefile("${path.module}/functions/token_authorizer.py",{
         valid_tokens = jsonencode({
-           principal_id = "regular-user"
-           role         = "user"
-           permissions  = "read"
+            "admin-token": {
+                "principal_id": "admin-user",
+                "role": "admin",
+                "permissions": "read,write,delete"
+            },
+            "user-token": {
+                "principal_id": "regular-user",
+                "role": "user",
+                "permissions": "read"
+            }
         })
       })
       filename = "token_authorizer.py"
@@ -29,7 +36,7 @@ data "archive_file" "protected_api_zip"{
     type = "zip"
     output_path = "${path.module}/protected_api_zip"
     source {
-      content = templatefile("${path.module}/functions/protected_api.py")
+      content = file("${path.module}/functions/protected_api.py")
       filename = "protected_api.py"
     }
 }
@@ -38,7 +45,7 @@ data "archive_file" "public_api_zip"{
     type = "zip"
     output_path = "${path.module}/public_api_zip"
     source {
-      content = templatefile("${path.module}/functions/public_api.py")
+      content = file("${path.module}/functions/public_api.py")
       filename = "public_api.py"
     }
 }
@@ -47,7 +54,7 @@ data "archive_file" "public_api_zip"{
 resource "aws_lambda_function" "token_authorizer" {
   filename = data.archive_file.token_authorizer_zip.output_path
   function_name = "token-authorizer-${local.name_surfix}"
-  role = aws_iam_role.lambda_execution_role
+  role = aws_iam_role.lambda_execution_role.arn
   handler = "token_authorizer.lambda_handler"
   runtime = "python3.9"
   timeout = 30
@@ -56,7 +63,7 @@ resource "aws_lambda_function" "token_authorizer" {
 
   depends_on = [ 
     aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_cloudwaws_cloudwatch_log_group.token_authorizer_logs
+    aws_cloudwatch_log_group.api_gateway_logs
    ]
 
   tags = local.common_tags
@@ -65,7 +72,7 @@ resource "aws_lambda_function" "token_authorizer" {
 resource "aws_lambda_function" "request_authorizer" {
   filename = data.archive_file.request_authorizer_zip.output_path
   function_name = "request-authorizer-${local.name_surfix}"
-  role = aws_iam_role.lambda_execution_role
+  role = aws_iam_role.lambda_execution_role.arn
   handler = "request_authorizer.lambda_handler"
   runtime = "python3.9"
   timeout = 30
@@ -74,7 +81,7 @@ resource "aws_lambda_function" "request_authorizer" {
 
    depends_on = [ 
     aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_cloudwaws_cloudwatch_log_group.request_authorizer_logs
+    aws_cloudwatch_log_group.api_gateway_logs
    ]
   tags = local.common_tags
 }
@@ -82,7 +89,7 @@ resource "aws_lambda_function" "request_authorizer" {
 resource "aws_lambda_function" "protected_api" {
   filename = data.archive_file.protected_api_zip.output_path
   function_name = "protected-api-${local.name_surfix}"
-  role = aws_iam_role.lambda_execution_role
+  role = aws_iam_role.lambda_execution_role.arn
   handler = "protected_api.lambda_handler"
   runtime = "python3.9"
   timeout = 30
@@ -90,8 +97,8 @@ resource "aws_lambda_function" "protected_api" {
   description = "Protected API function requiring authorization"
 
    depends_on = [ 
-    aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_cloudwaws_cloudwatch_log_group.protected_authorizer_logs
+      aws_iam_role_policy_attachment.lambda_basic_execution,
+      aws_cloudwatch_log_group.api_gateway_logs
    ]
 
   tags = local.common_tags
@@ -101,16 +108,16 @@ resource "aws_lambda_function" "protected_api" {
 resource "aws_lambda_function" "public_api" {
   filename = data.archive_file.public_api_zip.output_path
   function_name = "public_api-${local.name_surfix}"
-  role = aws_iam_role.lambda_execution_role
+  role = aws_iam_role.lambda_execution_role.arn
   handler = "public_api.lambda_handler"
   runtime = "python3.9"
   timeout = 30
-  source_code_hash = data.archive_file.public_api.output_base64sha256
+  source_code_hash = data.archive_file.public_api_zip.output_base64sha256
   description = "Public API function without authorization requirements"
 
   depends_on = [ 
-    aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_cloudwaws_cloudwatch_log_group.public_authorizer_logs
+      aws_iam_role_policy_attachment.lambda_basic_execution,
+      aws_cloudwatch_log_group.api_gateway_logs
    ]
 
   tags = local.common_tags

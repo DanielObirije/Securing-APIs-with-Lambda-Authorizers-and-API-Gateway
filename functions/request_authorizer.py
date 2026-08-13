@@ -10,13 +10,13 @@ def lambda_handler(event, context):
     source_ip = event.get("requestContext",{}).get("identity",{}).get("sourceIp","unknown")
     api_key = query_params.get("api_key","")
     custom_auth = headers.get("X-Custom-Auth","")
-    valid_api_key = "secret-api-key-123"
-    custom_auth_values = "custom-auth-value"
+    valid_api_keys = ${valid_api_keys}
+    custom_auth_values = ${custom_auth_values}
     principal_id = "unknown"
     effect = "Deny"
     context = {}
 
-    if api_key == valid_api_key:
+    if api_key == valid_api_keys:
         principal_id = "api-key-user"
         effect = "Allow"
         context = {

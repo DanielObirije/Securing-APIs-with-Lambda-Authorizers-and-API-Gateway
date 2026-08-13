@@ -10,7 +10,7 @@
    name =  "TokenAuthorizer"
    authorizer_type = "REQUEST"
    authorizer_uri = aws_lambda_function.token_authorizer.invoke_arn
-   authorizer_credentials_arn = aws_iam_role_policy.api_gateway_authorizer_policy.arn
+   authorizer_credentials_arn = aws_iam_role.api_gateway_authorizer_role.arn
    authorizer_payload_format_version = "2.0"
    enable_simple_responses = true
 
@@ -25,7 +25,7 @@
    name =  "RequestAuthorizer"
    authorizer_type = "REQUEST"
    authorizer_uri = aws_lambda_function.request_authorizer.invoke_arn
-   authorizer_credentials_arn = aws_iam_role_policy.api_gateway_authorizer_policy.arn
+   authorizer_credentials_arn = aws_iam_role.api_gateway_authorizer_role.arn
    authorizer_payload_format_version = "2.0"
    enable_simple_responses = true
 
