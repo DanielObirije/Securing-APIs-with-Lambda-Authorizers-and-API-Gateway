@@ -14,8 +14,8 @@ def lambda_handler(event,context):
     respond_data = {
             "message": "Access granted to protected resource",
             "status": "operational",
-             "timestamp": int(time.time()),
-             "request_id": context.aws_request_id,
+            "timestamp": int(time.time()),
+            "request_id": context.aws_request_id,
             "request_info": {
                 "method":  http_method,
                 "path": path,

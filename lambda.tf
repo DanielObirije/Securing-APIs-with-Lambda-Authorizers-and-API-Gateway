@@ -53,6 +53,12 @@ resource "aws_lambda_function" "token_authorizer" {
   timeout = 30
   source_code_hash = data.archive_file.token_authorizer_zip.output_base64sha256
   description = "Token-based API Gateway authorizer function"
+
+  depends_on = [ 
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+    aws_cloudwaws_cloudwatch_log_group.token_authorizer_logs
+   ]
+
   tags = local.common_tags
 }
 
@@ -65,6 +71,11 @@ resource "aws_lambda_function" "request_authorizer" {
   timeout = 30
   source_code_hash = data.archive_file.request_authorizer_zip.output_base64sha256
   description = "Request-based API Gateway authorizer function"
+
+   depends_on = [ 
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+    aws_cloudwaws_cloudwatch_log_group.request_authorizer_logs
+   ]
   tags = local.common_tags
 }
 
@@ -77,6 +88,12 @@ resource "aws_lambda_function" "protected_api" {
   timeout = 30
   source_code_hash = data.archive_file.protected_api_zip.output_base64sha256
   description = "Protected API function requiring authorization"
+
+   depends_on = [ 
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+    aws_cloudwaws_cloudwatch_log_group.protected_authorizer_logs
+   ]
+
   tags = local.common_tags
 }
 
@@ -90,6 +107,12 @@ resource "aws_lambda_function" "public_api" {
   timeout = 30
   source_code_hash = data.archive_file.public_api.output_base64sha256
   description = "Public API function without authorization requirements"
+
+  depends_on = [ 
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+    aws_cloudwaws_cloudwatch_log_group.public_authorizer_logs
+   ]
+
   tags = local.common_tags
 }
 

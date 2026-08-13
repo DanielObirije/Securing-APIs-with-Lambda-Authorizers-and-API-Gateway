@@ -55,7 +55,7 @@ resource "aws_iam_role_policy" "api_gateway_authorizer_policy" {
         ]
         Resource = [
            aws_lambda_function.token_authorizer.arn,
-           aws_lambda_function.token_authorizer.arn
+           aws_lambda_function.request_authorizer.arn
         ]
        }
     ]

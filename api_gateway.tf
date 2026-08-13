@@ -85,29 +85,29 @@ resource "aws_apigatewayv2_route" "admin" {
 }
 
 
-# resource "aws_apigatewayv2_stage" "api_stage" {
-#   api_id      = aws_apigatewayv2_api.secure_api.id
-#   name        = var.api_stage_name
-#   auto_deploy = true
+resource "aws_apigatewayv2_stage" "api_stage" {
+  api_id      = aws_apigatewayv2_api.secure_api.id
+  name        = local.api_stage_name
+  auto_deploy = true
 
-#   dynamic "access_log_settings" {
-#     for_each = var.enable_cloudwatch_logs ? [1] : []
+  dynamic "access_log_settings" {
+    for_each = local.enable_cloudwatch_logs ? [1] : []
 
-#     content {
-#       destination_arn = aws_cloudwatch_log_group.api_gateway_logs[0].arn
+    content {
+      destination_arn = aws_cloudwatch_log_group.api_gateway_logs.arn
 
-#       format = jsonencode({
-#         requestId      = "$context.requestId"
-#         ip             = "$context.identity.sourceIp"
-#         requestTime    = "$context.requestTime"
-#         httpMethod     = "$context.httpMethod"
-#         routeKey       = "$context.routeKey"
-#         status         = "$context.status"
-#         protocol       = "$context.protocol"
-#         responseLength = "$context.responseLength"
-#       })
-#     }
-#   }
+      format = jsonencode({
+        requestId      = "$context.requestId"
+        ip             = "$context.identity.sourceIp"
+        requestTime    = "$context.requestTime"
+        httpMethod     = "$context.httpMethod"
+        routeKey       = "$context.routeKey"
+        status         = "$context.status"
+        protocol       = "$context.protocol"
+        responseLength = "$context.responseLength"
+      })
+    }
+  }
 
-#   tags = local.common_tags
-# }
+  tags = local.common_tags
+}

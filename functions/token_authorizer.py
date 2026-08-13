@@ -21,7 +21,7 @@ def lambda_handler(event,context):
     method_arn = event.get("methodArn", "")
 
     if not token.startswith("Bearer "):
-        raise Exception("Unauthorized")
+        raise Exception("Unauthorized") 
 
     actual_token = token.replace("Bearer ", "",1)
 

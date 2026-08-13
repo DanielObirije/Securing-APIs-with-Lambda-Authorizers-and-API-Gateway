@@ -8,6 +8,8 @@ resource "random_id" "surffix" {
 
 locals {
   name_surfix = random_id.surffix.hex
+  api_stage_name = "prod"
+  enable_cloudwatch_logs = true
   common_tags = merge(
     {
         Project = "ServerlessAPIPatterns"
