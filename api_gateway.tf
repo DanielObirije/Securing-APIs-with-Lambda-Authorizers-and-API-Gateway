@@ -63,7 +63,7 @@
  resource "aws_apigatewayv2_route" "Public" {
     api_id = aws_apigatewayv2_api.secure_api.id
     route_key = "GET /public"
-    target = "integration/${aws_apigatewayv2_integration.public.id}"
+    target = "integrations/${aws_apigatewayv2_integration.public.id}"
  }
 
  resource "aws_apigatewayv2_route" "protected" {

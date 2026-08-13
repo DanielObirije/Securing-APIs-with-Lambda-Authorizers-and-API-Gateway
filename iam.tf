@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "api_gateway_authorizer_policy" {
    name = "secure-api-authorizer-policy-${local.name_surfix}"
    role = aws_iam_role.api_gateway_authorizer_role.id
    policy = jsonencode({
-    Version= "2012-11-17"
+    Version= "2012-10-17"
     Statement=[
        {
         Effect = "Allow"
